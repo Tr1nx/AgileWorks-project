@@ -1,0 +1,80 @@
+﻿@page
+@using Domain
+@model IndexModel
+
+@functions {
+    public string GetRowCssClass(Request request)
+    {
+        TimeSpan timeRemaining = request.Deadline - DateTime.Now;
+
+        if (timeRemaining.TotalHours < 1)
+        {
+            return "red-row";
+        }
+        return ""; 
+    }
+}
+
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h1 align="center">Tickets</h1>
+
+<form id="deleteForm" method="post">
+    
+    <div style="display: flex; justify-content: space-between;">
+        <p>
+            <a asp-page="/Requests/Create">Create New Ticket</a>
+        </p>
+    
+        <p>
+            <button type="submit" name="command" value="deleteResolved" class="btn btn-warning">Mark checked tickets resolved</button>
+        </p>
+    </div>
+    
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Request[0].Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Request[0].CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Request[0].Deadline)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Request[0].Resolved)
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Request)
+        {
+            <tr class="@GetRowCssClass(item)">
+                <td class="description-column">
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Deadline)
+                </td>
+                <td>
+                    <input type="checkbox" name="selectedRequests" value="@item.Id"/>
+                    <input type="hidden" name="resolvedStates" value="false"/>
+                </td>
+                <td align="right">
+                    <a asp-page="./Requests/Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-page="./Requests/Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Requests/Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</form>
